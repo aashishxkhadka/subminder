@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -12,41 +13,41 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import { toast } from "sonner"
+import Email from "next-auth/providers/email"
 
 export default function LoginPage() {
   const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setIsLoading(true)
-    setError("")
-
+    setLoading(true)
+    const formData = new FormData(e.currentTarget)
+    console.log(formData.get("email"),"formData")
     try {
-      // In a real app, you would validate credentials with your backend
-      // This is just a demo that simulates a successful login
-      if (email && password) {
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-
-        // Store some user info in localStorage (in a real app, you'd use cookies or a token)
-        localStorage.setItem("isLoggedIn", "true")
-        localStorage.setItem("userEmail", email)
-
-        // Redirect to dashboard
-        router.push("/dashboard")
-      } else {
-        setError("Please enter both email and password")
+      const res = await signIn("credentials", {
+        email: formData.get("email"),
+        password: formData.get("password"),
+        redirect: false,
+      })
+      console.log(res)
+      if (res?.error) {
+        setLoading(false)
+        return toast.error("Invalid credentials")
       }
-    } catch (err) {
-      setError("Invalid email or password")
-      console.error(err)
-    } finally {
-      setIsLoading(false)
+      if (!res) return toast.error("somethign went wrong")
+      toast.success("Login successful")
+      router.push("/dashboard") 
+      router.refresh()
+    } catch (error) {
+      setLoading(false)
+      return toast.error("Something went wrong")
     }
   }
 
@@ -61,17 +62,18 @@ export default function LoginPage() {
           <CardTitle className="text-2xl font-bold">Log in</CardTitle>
           <CardDescription>Enter your email and password to access your account</CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+
+        <form onSubmit={onSubmit}>
           <CardContent className="space-y-4">
             {error && <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">{error}</div>}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
+                name="email"
                 id="email"
                 type="email"
                 placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+               
                 required
               />
             </div>
@@ -85,13 +87,14 @@ export default function LoginPage() {
                   Forgot password?
                 </Link>
               </div>
+              
               <div className="relative">
                 <Input
+                  name="password"
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+
                   required
                 />
                 <Button
@@ -118,8 +121,8 @@ export default function LoginPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col">
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Logging in..." : "Log in"}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Logging in..." : "Log in"}
             </Button>
             <p className="mt-4 text-center text-sm text-muted-foreground">
               Don't have an account?{" "}

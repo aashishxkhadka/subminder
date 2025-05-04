@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // or "mysql" or "sqlite"
+  url      = env("DATABASE_URL")
+}
+model SuperAdmin{
+id            String @id @default(uuid()) 
+name          String
+email         String @unique
+phone         String
+password      String
+}
+
+model Business {
+  id             String       @id @default(uuid())
+  name           String
+  email          String       @unique
+  phone          String
+  address        String
+  password       String
+  registrationDate DateTime   @default(now())
+  logoUrl        String?
+  industryType   String
+  users          User[]
+  subscriptionPlans SubscriptionPlan[]
+  members        Member[]
+}
+
+model User {
+  id         String   @id @default(uuid())
+  name       String
+  email      String   @unique
+  password   String
+  role       Role
+  status     String   @default("active")
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String
+  loginLogs  LoginLog[]
+}
+
+model Member {
+  id               String     @id @default(uuid())
+  fullName         String
+  email            String
+  phone            String
+  gender           String
+  joinDate         DateTime   @default(now())
+  startDate        DateTime
+  endDate          DateTime
+  subscriptionStatus String
+  business         Business   @relation(fields: [businessId], references: [id])
+  businessId       String
+  subscriptionPlan SubscriptionPlan @relation(fields: [subscriptionPlanId], references: [id])
+  subscriptionPlanId String
+  billingRecords   Billing[]
+  notifications    Notification[]
+}
+
+model SubscriptionPlan {
+  id          String   @id @default(uuid())
+  planName    String
+  price       Float
+  duration    Int      // in days
+  features    String
+  business    Business @relation(fields: [businessId], references: [id])
+  businessId  String
+  members     Member[]
+}
+
+model Billing {
+  id         String   @id @default(uuid())
+  member     Member   @relation(fields: [memberId], references: [id])
+  memberId   String
+  amount     Float
+  billingDate DateTime @default(now())
+  dueDate    DateTime
+  status     String   // paid/unpaid
+  paymentLink String
+  payment    Payment?
+}
+
+model Payment {
+  id             String   @id @default(uuid())
+  billing        Billing  @relation(fields: [billingId], references: [id])
+  billingId      String   @unique
+  method         String   // eSewa, PayPal, Stripe
+  transactionId  String
+  paymentDate    DateTime @default(now())
+  paymentStatus  String
+}
+
+model Notification {
+  id               String   @id @default(uuid())
+  member           Member   @relation(fields: [memberId], references: [id])
+  memberId         String
+  message          String
+  notificationType String   // SMS/Email
+  scheduledDate    DateTime
+  status           String   // sent/pending
+}
+
+model LoginLog {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  loginTime  DateTime @default(now())
+  ipAddress  String
+  userAgent  String
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  ACCOUNTANT
+  SUPPORT
+}

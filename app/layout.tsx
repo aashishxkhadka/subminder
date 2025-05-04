@@ -1,13 +1,19 @@
+"use client"
 import type React from "react"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import './globals.css'
+import { Toast } from "@radix-ui/react-toast"
+import { Toaster } from "sonner"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
-export const metadata = {
-  title: "Subscription Management System",
-  description: "A modern dashboard for subscription management",
-    generator: 'v0.dev'
-}
 
+// export const metadata = {
+//   title: "Subscription Management System",
+//   description: "A modern dashboard for subscription management",
+//     generator: 'v0.dev'
+// }
+const queryClient=new QueryClient()
 export default function RootLayout({
   children,
 }: {
@@ -17,12 +23,13 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <QueryClientProvider client={queryClient}>
           {children}
+          </QueryClientProvider>
+          <Toaster/>
         </ThemeProvider>
       </body>
     </html>
   )
 }
 
-
-import './globals.css'
