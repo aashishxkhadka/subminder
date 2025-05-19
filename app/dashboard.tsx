@@ -16,6 +16,11 @@ import {
   Plus,
   RefreshCw,
   Sun,
+  Edit,
+  Trash,
+  CheckCircle,
+  AlertCircle,
+  XCircle,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -44,6 +49,228 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
 import { UserNav } from "@/components/user-nav"
+import { useMembers, useCreateMember, useUpdateMember, useDeleteMember } from "@/hooks/use-members"
+import { useSubscriptionPlans } from "@/hooks/use-subscription-plans"
+import { Member, MemberFormData } from "@/types/member"
+import { MemberForm } from "@/components/member-form"
+
+interface MetricCardProps {
+  title: string
+  value: string
+  description: string
+  icon: React.ReactNode
+  trend?: "up" | "down"
+}
+
+function MetricCard({ title, value, description, icon, trend = "up" }: MetricCardProps) {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        {icon}
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        <p className={`text-xs ${trend === "up" ? "text-green-500" : "text-red-500"}`}>{description}</p>
+      </CardContent>
+    </Card>
+  )
+}
+
+interface SidebarProps {
+  activeSection: string
+  setActiveSection: (section: string) => void
+}
+
+function DesktopSidebar({ activeSection, setActiveSection }: SidebarProps) {
+  return (
+    <div className="flex h-full flex-col gap-2">
+      <div className="flex h-14 items-center border-b px-4">
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/subminder-logo.png" alt="Subminder" width={120} height={30} className="h-auto" priority />
+        </Link>
+      </div>
+      <div className="flex-1 overflow-auto py-2">
+        <nav className="grid items-start px-2 text-sm font-medium">
+          <Link
+            href="#"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+              activeSection === "dashboard"
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveSection("dashboard")}
+          >
+            <Home className="h-4 w-4" />
+            Dashboard
+          </Link>
+          <Link
+            href="#"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+              activeSection === "subscriptions"
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveSection("subscriptions")}
+          >
+            <CreditCard className="h-4 w-4" />
+            Subscriptions
+          </Link>
+          <Link
+            href="#"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+              activeSection === "customers"
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveSection("customers")}
+          >
+            <Users className="h-4 w-4" />
+            Customers
+          </Link>
+          <Link
+            href="#"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+              activeSection === "billing"
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveSection("billing")}
+          >
+            <DollarSign className="h-4 w-4" />
+            Billing
+          </Link>
+          <Link
+            href="#"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+              activeSection === "analytics"
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveSection("analytics")}
+          >
+            <LineChartIcon className="h-4 w-4" />
+            Analytics
+          </Link>
+          <Link
+            href="#"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+              activeSection === "settings"
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveSection("settings")}
+          >
+            <Settings className="h-4 w-4" />
+            Settings
+          </Link>
+        </nav>
+      </div>
+      <div className="mt-auto p-4">
+        <Card>
+          <CardHeader className="p-4">
+            <CardTitle className="text-sm">Need Help?</CardTitle>
+            <CardDescription className="text-xs">Contact our support team</CardDescription>
+          </CardHeader>
+          <CardFooter className="p-4 pt-0">
+            <Button variant="outline" size="sm" className="w-full">
+              <HelpCircle className="mr-2 h-4 w-4" />
+              Support
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    </div>
+  )
+}
+
+function MobileSidebar({ activeSection, setActiveSection }: SidebarProps) {
+  return (
+    <div className="flex h-full flex-col gap-2">
+      <div className="flex h-14 items-center border-b px-4">
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/subminder-logo.png" alt="Subminder" width={120} height={30} className="h-auto" priority />
+        </Link>
+      </div>
+      <div className="flex-1 overflow-auto py-2">
+        <nav className="grid items-start px-2 text-sm font-medium">
+          <Link
+            href="#"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+              activeSection === "dashboard"
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveSection("dashboard")}
+          >
+            <Home className="h-4 w-4" />
+            Dashboard
+          </Link>
+          <Link
+            href="#"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+              activeSection === "subscriptions"
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveSection("subscriptions")}
+          >
+            <CreditCard className="h-4 w-4" />
+            Subscriptions
+          </Link>
+          <Link
+            href="#"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+              activeSection === "customers"
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveSection("customers")}
+          >
+            <Users className="h-4 w-4" />
+            Customers
+          </Link>
+          <Link
+            href="#"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+              activeSection === "billing"
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveSection("billing")}
+          >
+            <DollarSign className="h-4 w-4" />
+            Billing
+          </Link>
+          <Link
+            href="#"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+              activeSection === "analytics"
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveSection("analytics")}
+          >
+            <LineChartIcon className="h-4 w-4" />
+            Analytics
+          </Link>
+          <Link
+            href="#"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+              activeSection === "settings"
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveSection("settings")}
+          >
+            <Settings className="h-4 w-4" />
+            Settings
+          </Link>
+        </nav>
+      </div>
+    </div>
+  )
+}
 
 export default function Dashboard() {
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -257,14 +484,14 @@ const invoiceData = [
 ]
 
 // Helper functions
-function getStatusVariant(status) {
+function getStatusVariant(status: string) {
   switch (status) {
     case "Active":
-      return "success"
-    case "Trial":
-      return "warning"
-    case "Pending":
       return "default"
+    case "Trial":
+      return "secondary"
+    case "Pending":
+      return "outline"
     case "Canceled":
       return "destructive"
     default:
@@ -272,12 +499,12 @@ function getStatusVariant(status) {
   }
 }
 
-function getBillingStatusVariant(status) {
+function getBillingStatusVariant(status: string) {
   switch (status) {
     case "Paid":
-      return "success"
+      return "default"
     case "Pending":
-      return "warning"
+      return "secondary"
     case "Overdue":
       return "destructive"
     default:
@@ -677,49 +904,103 @@ function DashboardContent() {
 
 // Update the CustomersContent function to include demo data
 function CustomersContent() {
+  const { data: members, isLoading } = useMembers()
+  const { data: subscriptionPlans } = useSubscriptionPlans()
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [editingMember, setEditingMember] = useState<Member | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
+
+  const createMember = useCreateMember()
+  const updateMember = useUpdateMember()
+  const deleteMember = useDeleteMember()
+
+  const handleAddMember = (data: MemberFormData) => {
+    createMember.mutate(data, {
+      onSuccess: () => {
+        setIsAddDialogOpen(false)
+      },
+    })
+  }
+
+  const handleUpdateMember = (data: MemberFormData) => {
+    if (editingMember) {
+      updateMember.mutate(
+        { id: editingMember.id, data },
+        {
+          onSuccess: () => {
+            setIsEditDialogOpen(false)
+            setEditingMember(null)
+          },
+        }
+      )
+    }
+  }
+
+  const handleDeleteMember = (id: string) => {
+    deleteMember.mutate(id)
+  }
+
+  const filteredMembers = members?.filter((member) =>
+    member.fullName.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const activeSubscriptions = members?.filter((member) => member.subscriptionStatus === "active").length || 0
+  const expiringSoon = members?.filter((member) => {
+    const endDate = new Date(member.endDate)
+    const today = new Date()
+    const daysUntilExpiry = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+    return daysUntilExpiry <= 30 && daysUntilExpiry > 0
+  }).length || 0
+  const expiredSubscriptions = members?.filter((member) => member.subscriptionStatus === "expired").length || 0
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Customers</h2>
         <div className="flex items-center gap-2">
-          <Input placeholder="Search customers..." className="w-64" />
-          <Button>
-            <Users className="mr-2 h-4 w-4" />
-            Add Customer
-          </Button>
+          <Input
+            placeholder="Search customers..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-[300px]"
+          />
         </div>
+        <Button variant="default" onClick={() => setIsAddDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Customer
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Total Customers"
-          value="2,543"
-          description="+12.3% from last month"
+          value={members?.length.toString() || "0"}
+          description="Total number of customers"
           icon={<Users className="h-4 w-4 text-muted-foreground" />}
         />
         <MetricCard
-          title="Active Customers"
-          value="2,105"
-          description="+8.7% from last month"
-          icon={<Users className="h-4 w-4 text-muted-foreground" />}
+          title="Active Subscriptions"
+          value={activeSubscriptions.toString()}
+          description="Currently active subscriptions"
+          icon={<CheckCircle className="h-4 w-4 text-muted-foreground" />}
         />
         <MetricCard
-          title="New Customers"
-          value="342"
-          description="+12.7% from last month"
-          icon={<Users className="h-4 w-4 text-muted-foreground" />}
+          title="Expiring Soon"
+          value={expiringSoon.toString()}
+          description="Subscriptions expiring in 30 days"
+          icon={<AlertCircle className="h-4 w-4 text-muted-foreground" />}
         />
         <MetricCard
-          title="Customer Retention"
-          value="94.2%"
-          description="+1.5% from last month"
-          icon={<Users className="h-4 w-4 text-muted-foreground" />}
+          title="Expired"
+          value={expiredSubscriptions.toString()}
+          description="Expired subscriptions"
+          icon={<XCircle className="h-4 w-4 text-muted-foreground" />}
         />
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Customer List</CardTitle>
+          <CardTitle>Customers</CardTitle>
           <CardDescription>Manage your customers and their subscriptions</CardDescription>
         </CardHeader>
         <CardContent>
@@ -728,60 +1009,110 @@ function CustomersContent() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Subscriptions</TableHead>
-                <TableHead>Joined</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Subscription Plan</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {customerData.map((customer) => (
-                <TableRow key={customer.id}>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage
-                          src={`/placeholder.svg?height=32&width=32&text=${customer.name.charAt(0)}`}
-                          alt={customer.name}
-                        />
-                        <AvatarFallback>{customer.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      {customer.name}
-                    </div>
-                  </TableCell>
-                  <TableCell>{customer.email}</TableCell>
-                  <TableCell>{customer.subscriptions}</TableCell>
-                  <TableCell>{customer.joined}</TableCell>
-                  <TableCell>
-                    <Badge variant={customer.status === "Active" ? "success" : "destructive"}>{customer.status}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="sm">
-                        View
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        Edit
-                      </Button>
-                    </div>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center">
+                    Loading...
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : filteredMembers?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center">
+                    No customers found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredMembers?.map((member) => (
+                  <TableRow key={member.id}>
+                    <TableCell>{member.fullName}</TableCell>
+                    <TableCell>{member.email}</TableCell>
+                    <TableCell>{member.phone}</TableCell>
+                    <TableCell>{member.subscriptionPlan?.planName}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          member.subscriptionStatus === "active"
+                            ? "default"
+                            : member.subscriptionStatus === "expired"
+                            ? "destructive"
+                            : "secondary"
+                        }
+                      >
+                        {member.subscriptionStatus}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setEditingMember(member)
+                            setIsEditDialogOpen(true)
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteMember(member.id)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
-        <CardFooter className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">Showing 5 of 100 customers</p>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" disabled>
-              Previous
-            </Button>
-            <Button variant="outline" size="sm">
-              Next
-            </Button>
-          </div>
-        </CardFooter>
       </Card>
+
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Customer</DialogTitle>
+            <DialogDescription>Add a new customer to your business</DialogDescription>
+          </DialogHeader>
+          <MemberForm
+            onSubmit={handleAddMember}
+            subscriptionPlans={subscriptionPlans || []}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Customer</DialogTitle>
+            <DialogDescription>Update customer information</DialogDescription>
+          </DialogHeader>
+          {editingMember && (
+            <MemberForm
+              defaultValues={{
+                fullName: editingMember.fullName,
+                email: editingMember.email,
+                phone: editingMember.phone,
+                gender: editingMember.gender as "male" | "female" | "other",
+                startDate: new Date(editingMember.startDate).toISOString().split("T")[0],
+                endDate: new Date(editingMember.endDate).toISOString().split("T")[0],
+                subscriptionPlanId: editingMember.subscriptionPlanId,
+              }}
+              onSubmit={handleUpdateMember}
+              subscriptionPlans={subscriptionPlans || []}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -1391,211 +1722,5 @@ function SubscriptionDistributionChart() {
         </PieChart>
       </ResponsiveContainer>
     </ChartContainer>
-  )
-}
-
-// Add the MetricCard component
-function MetricCard({ title, value, description, icon, trend = "up" }) {
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        {icon}
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        <p className={`text-xs ${trend === "up" ? "text-green-500" : "text-red-500"}`}>{description}</p>
-      </CardContent>
-    </Card>
-  )
-}
-
-function DesktopSidebar({ activeSection, setActiveSection }) {
-  return (
-    <div className="flex h-full flex-col gap-2">
-      <div className="flex h-14 items-center border-b px-4">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/subminder-logo.png" alt="Subminder" width={120} height={30} className="h-auto" priority />
-        </Link>
-      </div>
-      <div className="flex-1 overflow-auto py-2">
-        <nav className="grid items-start px-2 text-sm font-medium">
-          <Link
-            href="#"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-              activeSection === "dashboard"
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setActiveSection("dashboard")}
-          >
-            <Home className="h-4 w-4" />
-            Dashboard
-          </Link>
-          <Link
-            href="#"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-              activeSection === "subscriptions"
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setActiveSection("subscriptions")}
-          >
-            <CreditCard className="h-4 w-4" />
-            Subscriptions
-          </Link>
-          <Link
-            href="#"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-              activeSection === "customers"
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setActiveSection("customers")}
-          >
-            <Users className="h-4 w-4" />
-            Customers
-          </Link>
-          <Link
-            href="#"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-              activeSection === "billing"
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setActiveSection("billing")}
-          >
-            <DollarSign className="h-4 w-4" />
-            Billing
-          </Link>
-          <Link
-            href="#"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-              activeSection === "analytics"
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setActiveSection("analytics")}
-          >
-            <LineChartIcon className="h-4 w-4" />
-            Analytics
-          </Link>
-          <Link
-            href="#"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-              activeSection === "settings"
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setActiveSection("settings")}
-          >
-            <Settings className="h-4 w-4" />
-            Settings
-          </Link>
-        </nav>
-      </div>
-      <div className="mt-auto p-4">
-        <Card>
-          <CardHeader className="p-4">
-            <CardTitle className="text-sm">Need Help?</CardTitle>
-            <CardDescription className="text-xs">Contact our support team</CardDescription>
-          </CardHeader>
-          <CardFooter className="p-4 pt-0">
-            <Button variant="outline" size="sm" className="w-full">
-              <HelpCircle className="mr-2 h-4 w-4" />
-              Support
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    </div>
-  )
-}
-
-function MobileSidebar({ activeSection, setActiveSection }) {
-  return (
-    <div className="flex h-full flex-col gap-2">
-      <div className="flex h-14 items-center border-b px-4">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/subminder-logo.png" alt="Subminder" width={120} height={30} className="h-auto" priority />
-        </Link>
-      </div>
-      <div className="flex-1 overflow-auto py-2">
-        <nav className="grid items-start px-2 text-sm font-medium">
-          <Link
-            href="#"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-              activeSection === "dashboard"
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setActiveSection("dashboard")}
-          >
-            <Home className="h-4 w-4" />
-            Dashboard
-          </Link>
-          <Link
-            href="#"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-              activeSection === "subscriptions"
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setActiveSection("subscriptions")}
-          >
-            <CreditCard className="h-4 w-4" />
-            Subscriptions
-          </Link>
-          <Link
-            href="#"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-              activeSection === "customers"
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setActiveSection("customers")}
-          >
-            <Users className="h-4 w-4" />
-            Customers
-          </Link>
-          <Link
-            href="#"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-              activeSection === "billing"
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setActiveSection("billing")}
-          >
-            <DollarSign className="h-4 w-4" />
-            Billing
-          </Link>
-          <Link
-            href="#"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-              activeSection === "analytics"
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setActiveSection("analytics")}
-          >
-            <LineChartIcon className="h-4 w-4" />
-            Analytics
-          </Link>
-          <Link
-            href="#"
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-              activeSection === "settings"
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            onClick={() => setActiveSection("settings")}
-          >
-            <Settings className="h-4 w-4" />
-            Settings
-          </Link>
-        </nav>
-      </div>
-    </div>
   )
 }
