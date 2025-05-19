@@ -25,6 +25,8 @@ import { useQuery, useMutation } from "@tanstack/react-query"
 import { format } from "date-fns"
 import { toast } from "sonner"
 import { useCreateMember } from "@/hooks/use-members"
+import { useSession } from "next-auth/react"
+import { useEffect } from "react"
 
 const memberSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -43,6 +45,7 @@ type MemberFormValues = z.infer<typeof memberSchema>
 export default function NewMemberPage() {
   const router = useRouter()
   const createMember = useCreateMember()
+  const session = useSession()
 
   const form = useForm<MemberFormValues>({
     resolver: zodResolver(memberSchema),
@@ -51,12 +54,19 @@ export default function NewMemberPage() {
       email: "",
       phone: "",
       gender: "",
-      startDate: format(new Date(), "yyyy-MM-dd"),
-      endDate: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
+      startDate: "",
+      endDate: "",
       subscriptionStatus: "active",
       subscriptionPlanId: "",
-      businessId: "0b57275e-b0da-463b-9509-054f1f9f2448",
+      businessId: session.data?.user.id || "",
     },
+  })
+
+  useEffect(() => {
+    form.reset({
+      ...form.getValues(),
+      businessId: session.data?.user.id || "",
+    })
   })
 
   const { data: subscriptionPlans, isLoading: isLoadingPlans } = useQuery({

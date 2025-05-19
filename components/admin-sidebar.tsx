@@ -24,7 +24,7 @@ const adminNavItems = [
   },
   {
     title: "Customers",
-    href: "/dashboard/customer",
+    href: "/dashboard/members",
     icon: Users
   },
   {

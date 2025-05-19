@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -46,6 +45,7 @@ export default function MembersPage() {
       await deleteMember.mutateAsync(memberToDelete)
       setDeleteDialogOpen(false)
       setMemberToDelete(null)
+      toast.success("Member deleted")
     } catch (error) {
       // Error is handled by the mutation
     }
@@ -89,11 +89,9 @@ export default function MembersPage() {
         </div>
       </div>
 
-        <div className="flex justify-end">
-        
-          <Button onClick={() => setModalOpen(true)}>+ Add New Member</Button>
-        </div>
-      
+      <div className="flex justify-end">
+        <Button onClick={() => setModalOpen(true)}>+ Add New Member</Button>
+      </div>
 
       <div className="rounded-md border bg-background">
         <Table>
@@ -154,7 +152,7 @@ export default function MembersPage() {
                   </TableCell>
                   <TableCell>{format(new Date(member.joinDate), "MMM d, yyyy")}</TableCell>
                   <TableCell>
-                    {(isAdmin || isManager) && (
+                    {(
                       <>
                         <Button
                           variant="outline"
@@ -164,11 +162,17 @@ export default function MembersPage() {
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => handleDelete(member.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                        {/* Delete confirmation dialog */}
                         <AlertDialog open={deleteDialogOpen && memberToDelete === member.id} onOpenChange={setDeleteDialogOpen}>
                           <AlertDialogTrigger asChild>
-                            <Button variant="destructive" size="icon">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <span />
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <div className="space-y-4">
@@ -199,6 +203,7 @@ export default function MembersPage() {
         </Table>
       </div>
 
+      {/* Pagination */}
       {data?.pagination && data.pagination.pages > 1 && (
         <div className="flex justify-end items-center gap-2">
           <Button
@@ -230,4 +235,4 @@ export default function MembersPage() {
       />
     </div>
   )
-} 
+}
