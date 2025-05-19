@@ -35,7 +35,6 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        // @ts-expect-error we assume user.id exists every time
         session.user.id = token.userId as string;
         session.user.image = session.user.image || "https://github.com/shadcn.png";
       }

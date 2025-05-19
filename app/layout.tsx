@@ -3,11 +3,11 @@ import type React from "react"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import './globals.css'
-import { Toast } from "@radix-ui/react-toast"
 import { Toaster } from "sonner"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { SessionProvider } from "next-auth/react"
 
-const queryClient=new QueryClient()
+const queryClient = new QueryClient()
 export default function RootLayout({
   children,
 }: {
@@ -16,12 +16,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <QueryClientProvider client={queryClient}>
-          {children}
-          </QueryClientProvider>
-          <Toaster/>
-        </ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <QueryClientProvider client={queryClient}>
+              {children}
+            </QueryClientProvider>
+            <Toaster />
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   )
