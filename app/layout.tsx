@@ -7,12 +7,6 @@ import { Toast } from "@radix-ui/react-toast"
 import { Toaster } from "sonner"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
-
-// export const metadata = {
-//   title: "Subscription Management System",
-//   description: "A modern dashboard for subscription management",
-//     generator: 'v0.dev'
-// }
 const queryClient=new QueryClient()
 export default function RootLayout({
   children,
