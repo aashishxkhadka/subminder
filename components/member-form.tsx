@@ -1,3 +1,5 @@
+"use client"
+
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -18,47 +20,56 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useQuery } from "@tanstack/react-query"
+import { format } from "date-fns"
 
-const memberFormSchema = z.object({
+const memberSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  gender: z.enum(["male", "female", "other"]),
-  startDate: z.string().min(1, "Start date is required"),
-  endDate: z.string().min(1, "End date is required"),
-  subscriptionPlanId: z.string().min(1, "Subscription plan is required"),
+  gender: z.string(),
+  startDate: z.string(),
+  endDate: z.string(),
+  subscriptionStatus: z.string(),
+  subscriptionPlanId: z.string(),
 })
 
-type MemberFormValues = z.infer<typeof memberFormSchema>
+type MemberFormValues = z.infer<typeof memberSchema>
 
 interface MemberFormProps {
-  defaultValues?: Partial<MemberFormValues>
   onSubmit: (data: MemberFormValues) => void
-  subscriptionPlans: Array<{
-    id: string
-    planName: string
-    price: number
-  }>
+  defaultValues?: Partial<MemberFormValues>
+  isLoading?: boolean
 }
 
-export function MemberForm({ defaultValues, onSubmit, subscriptionPlans }: MemberFormProps) {
+export function MemberForm({ onSubmit, defaultValues, isLoading }: MemberFormProps) {
   const form = useForm<MemberFormValues>({
-    resolver: zodResolver(memberFormSchema),
+    resolver: zodResolver(memberSchema),
     defaultValues: {
       fullName: "",
       email: "",
       phone: "",
-      gender: "male",
-      startDate: "",
-      endDate: "",
+      gender: "",
+      startDate: format(new Date(), "yyyy-MM-dd"),
+      endDate: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
+      subscriptionStatus: "active",
       subscriptionPlanId: "",
       ...defaultValues,
     },
   })
 
+  const { data: subscriptionPlans } = useQuery({
+    queryKey: ["subscription-plans"],
+    queryFn: async () => {
+      const res = await fetch("/api/subscription")
+      if (!res.ok) throw new Error("Failed to fetch subscription plans")
+      return res.json()
+    },
+  })
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="fullName"
@@ -66,7 +77,7 @@ export function MemberForm({ defaultValues, onSubmit, subscriptionPlans }: Membe
             <FormItem>
               <FormLabel>Full Name</FormLabel>
               <FormControl>
-                <Input placeholder="John Doe" {...field} />
+                <Input placeholder="Enter full name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -80,7 +91,7 @@ export function MemberForm({ defaultValues, onSubmit, subscriptionPlans }: Membe
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="john@example.com" type="email" {...field} />
+                <Input type="email" placeholder="Enter email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -94,7 +105,7 @@ export function MemberForm({ defaultValues, onSubmit, subscriptionPlans }: Membe
             <FormItem>
               <FormLabel>Phone</FormLabel>
               <FormControl>
-                <Input placeholder="+1234567890" {...field} />
+                <Input placeholder="Enter phone number" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -124,29 +135,54 @@ export function MemberForm({ defaultValues, onSubmit, subscriptionPlans }: Membe
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="startDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Start Date</FormLabel>
-              <FormControl>
-                <Input type="date" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="startDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Start Date</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="endDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>End Date</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
-          name="endDate"
+          name="subscriptionStatus"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>End Date</FormLabel>
-              <FormControl>
-                <Input type="date" {...field} />
-              </FormControl>
+              <FormLabel>Status</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="suspended">Suspended</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -161,11 +197,11 @@ export function MemberForm({ defaultValues, onSubmit, subscriptionPlans }: Membe
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a plan" />
+                    <SelectValue placeholder="Select subscription plan" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {subscriptionPlans.map((plan) => (
+                  {subscriptionPlans?.map((plan: any) => (
                     <SelectItem key={plan.id} value={plan.id}>
                       {plan.planName} - ${plan.price}
                     </SelectItem>
@@ -177,8 +213,8 @@ export function MemberForm({ defaultValues, onSubmit, subscriptionPlans }: Membe
           )}
         />
 
-        <Button type="submit" className="w-full">
-          {defaultValues ? "Update Member" : "Add Member"}
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Saving..." : "Save Member"}
         </Button>
       </form>
     </Form>
