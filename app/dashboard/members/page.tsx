@@ -12,6 +12,15 @@ import { useMembers, useDeleteMember } from "@/hooks/use-members"
 import { MemberFormModal } from "@/components/member-form-modal"
 import { useSession } from "next-auth/react"
 import { useDebounce } from "@/hooks/use-debounce"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export default function MembersPage() {
   const { data: session } = useSession()
@@ -73,19 +82,26 @@ export default function MembersPage() {
             }}
             className="w-64"
           />
-          <select
+          <Select
             value={status}
-            onChange={e => {
-              setStatus(e.target.value || undefined)
+            onValueChange={value => {
+              setStatus(value || undefined)
               setPage(1)
             }}
-            className="h-10 rounded-md border border-input bg-background px-3 py-2"
+            // className="h-10 rounded-md border border-input bg-background px-3 py-2"
           >
-            <option value="">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="suspended">Suspended</option>
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Status</SelectLabel>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="suspended">Suspended</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -140,13 +156,12 @@ export default function MembersPage() {
                   <TableCell>{member.phone}</TableCell>
                   <TableCell>{member.subscriptionPlan.planName}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      member.subscriptionStatus === "active" 
-                        ? "bg-green-100 text-green-800"
-                        : member.subscriptionStatus === "suspended"
+                    <span className={`px-2 py-1 rounded-full text-xs ${member.subscriptionStatus === "active"
+                      ? "bg-green-100 text-green-800"
+                      : member.subscriptionStatus === "suspended"
                         ? "bg-yellow-100 text-yellow-800"
                         : "bg-red-100 text-red-800"
-                    }`}>
+                      }`}>
                       {member.subscriptionStatus}
                     </span>
                   </TableCell>
