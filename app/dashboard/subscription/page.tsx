@@ -8,6 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Pencil, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
+import { AlertDialog, AlertDialogContent, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { toast } from "sonner"
 
 type SubscriptionPlan = {
   id: string
@@ -55,13 +57,11 @@ export default function Page() {
     router.push(`/dashboard/subscription/${id}`)
   }
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this subscription?")) return
     await fetch(`/api/subscription/${id}`, { method: "DELETE" })
     queryClient.invalidateQueries({ queryKey: ["subscriptions"] })
+    toast.success("Subscription plan deleted")
   }
 
-const session = useSession()
-  
 
   return (
     <div className="space-y-6">
@@ -121,13 +121,30 @@ const session = useSession()
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => handleDelete(plan.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="icon">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <div className="space-y-4">
+                          <h3 className="text-lg font-semibold">Delete Subscription</h3>
+                          <p>Are you sure you want to delete this subscription plan?</p>
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <Button variant="outline" onClick={() => setPage(1)}>
+                            Cancel
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            onClick={() => handleDelete(plan.id)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </TableCell>
                 </TableRow>
               ))
