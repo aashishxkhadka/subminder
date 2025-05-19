@@ -14,7 +14,6 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
-import Email from "next-auth/providers/email"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -23,25 +22,26 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
     const formData = new FormData(e.currentTarget)
-    console.log(formData.get("email"),"formData")
     try {
+      console.log("In login component, signing in...")
+      console.log("credentials:", formData.get("email"))
+      console.log("credentials:", formData.get("password"))
       const res = await signIn("credentials", {
         email: formData.get("email"),
         password: formData.get("password"),
         redirect: false,
       })
-      console.log(res)
+      console.log("RES:", res)
       if (res?.error) {
         setLoading(false)
-        return toast.error("Invalid credentials")
+        return toast.error(res?.error)
       }
-      if (!res) return toast.error("somethign went wrong")
+      if (!res) return toast.error("something went wrong")
       toast.success("Login successful")
       router.push("/dashboard") 
       router.refresh()
@@ -73,7 +73,6 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 placeholder="name@example.com"
-               
                 required
               />
             </div>

@@ -12,7 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useSession } from "next-auth/react"
 
 const subscriptionSchema = z.object({
   planName: z.string().min(1, "Plan name is required"),
@@ -33,6 +34,8 @@ export default function NewSubscriptionPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const session = useSession();
+  const businessId = session.data?.user?.id || "";
 
   const {
     register,
@@ -49,6 +52,16 @@ export default function NewSubscriptionPage() {
       businessId: "",
     },
   })
+
+  useEffect(() => {
+    reset({
+      planName: "",
+      price: 0,
+      duration: 1,
+      features: "",
+      businessId: businessId,
+    })
+  }, [businessId, reset])
 
   const mutation = useMutation({
     mutationFn: createSubscription,
@@ -103,13 +116,6 @@ export default function NewSubscriptionPage() {
               <Textarea id="features" {...register("features")} />
               {errors.features && (
                 <p className="text-sm text-red-500">{errors.features.message}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="businessId">Business ID</Label>
-              <Input id="businessId" {...register("businessId")} />
-              {errors.businessId && (
-                <p className="text-sm text-red-500">{errors.businessId.message}</p>
               )}
             </div>
             <div className="flex gap-2">

@@ -55,14 +55,14 @@ export default function NewMemberPage() {
       endDate: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
       subscriptionStatus: "active",
       subscriptionPlanId: "",
-      businessId: "0b57275e-b0da-463b-9509-054f1f9f2448", // Default business ID
+      businessId: "0b57275e-b0da-463b-9509-054f1f9f2448",
     },
   })
 
   const { data: subscriptionPlans, isLoading: isLoadingPlans } = useQuery({
-    queryKey: ["subscription-plans"],
+    queryKey: ["subscription"],
     queryFn: async () => {
-      const res = await fetch("/api/subscription-plans")
+      const res = await fetch("/api/subscription")
       if (!res.ok) throw new Error("Failed to fetch subscription plans")
       return res.json()
     },

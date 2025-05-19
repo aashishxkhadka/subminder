@@ -1,12 +1,17 @@
 "use client"
 import AdminSidebar from "@/components/admin-sidebar";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
-export default async function AdminLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
   }) {
+  const session = useSession();
+  const router = useRouter();
+
+  if (!session.data?.user) router.push("/login")
   return (
     <SessionProvider>
       <div className="min-h-screen bg-background">
