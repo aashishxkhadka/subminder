@@ -1,3 +1,4 @@
+"use client"
 import AdminSidebar from "@/components/admin-sidebar";
 import { SessionProvider } from "next-auth/react";
 
