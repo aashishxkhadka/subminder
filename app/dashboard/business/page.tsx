@@ -28,13 +28,13 @@ export default function BusinessRegisterForm() {
   const mutation = useMutation({
     mutationFn: async (data: BusinessFormData) => {
         console.log(data)
-      const res = await axios.post("/api/user", data)
+      const res = await axios.post("/api/business", data)
       return res.data
     },
     onSuccess: () => {
       toast.success("Registration Successful" )
       reset()
-      router.push("/login")
+      
     },
     onError: (error: any) => {
       toast.error("Registration Failed" )

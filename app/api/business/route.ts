@@ -1,70 +1,71 @@
-// app/api/business/route.ts
 import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 import prisma from "@/prisma/prismaClient";
-import { verifyToken } from "@/lib/auth"; // optional helper to extract JWT
+import jwt from "jsonwebtoken";
 
-// Get logged-in business profile
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const token = req.headers.get("authorization")?.split(" ")[1];
-    const decoded = verifyToken(token); // Custom function to decode JWT
-    const businessId = decoded?.id;
-
-    if (!businessId) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    const business = await prisma.business.findUnique({
-      where: { id: businessId },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        address: true,
-        industryType: true,
-        logoUrl: true,
-        registrationDate: true,
-      }
-    });
-
-    return NextResponse.json(business);
-  } catch (error) {
-    console.error("GET /business error:", error);
-    return NextResponse.json({ message: "Failed to fetch business profile" }, { status: 500 });
-  }
-}
-
-// Update business profile
-export async function PATCH(req: NextRequest) {
-  try {
-    const token = req.headers.get("authorization")?.split(" ")[1];
-    const decoded = verifyToken(token);
-    const businessId = decoded?.id;
-
-    if (!businessId) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
     const body = await req.json();
 
-    const updatedBusiness = await prisma.business.update({
-      where: { id: businessId },
+    const requiredFields = ["name", "email", "password", "phone", "address", "industryType"];
+    for (const field of requiredFields) {
+      if (!body[field]) {
+        return NextResponse.json(
+          { message: `${field} is required.` },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Check if business already exists
+    const existingBusiness = await prisma.business.findUnique({
+      where: { email: body.email },
+    });
+
+    if (existingBusiness) {
+      return NextResponse.json(
+        { message: "Business with this email already exists." },
+        { status: 400 }
+      );
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(body.password, 10);
+
+    // Create business
+    const newBusiness = await prisma.business.create({
       data: {
         name: body.name,
+        email: body.email,
         phone: body.phone,
         address: body.address,
         industryType: body.industryType,
-        logoUrl: body.logoUrl,
+        password: hashedPassword,
+        logoUrl: body.logoUrl || null,
       },
     });
 
-    return NextResponse.json({
-      message: "Business profile updated successfully",
-      data: updatedBusiness,
-    });
-  } catch (error) {
-    console.error("PATCH /business error:", error);
-    return NextResponse.json({ message: "Failed to update business profile" }, { status: 500 });
+    // Generate JWT
+    const token = jwt.sign(
+      { email: newBusiness.email, id: newBusiness.id },
+      process.env.JWT_SECRET!,
+      { expiresIn: "10m" }
+    );
+
+    return NextResponse.json(
+      {
+        message: "Business registered successfully",
+        data: newBusiness,
+        token,
+      },
+      { status: 201 }
+    );
+
+  } catch (error: any) {
+    console.error("Registration error:", error);
+    return NextResponse.json(
+      { message: error.message || "Something went wrong" },
+      { status: 500 }
+    );
   }
 }
