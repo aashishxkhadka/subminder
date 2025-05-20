@@ -53,7 +53,7 @@ export default function SubscriptionLookup() {
     <div className="container max-w-2xl py-12">
       <Card>
         <CardHeader>
-          <CardTitle>Check Your Subscription</CardTitle>
+          <CardTitle>Check Your Subscription Status</CardTitle>
           <CardDescription>
             Enter your email address to view your subscription details
           </CardDescription>

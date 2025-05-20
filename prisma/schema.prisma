@@ -57,6 +57,8 @@ model Member {
   subscriptionPlanId String
   billingRecords   Billing[]
   notifications    Notification[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt @default(now())
 }
 
 model SubscriptionPlan {

@@ -1,5 +1,5 @@
 "use client"
-
+import { AnalyticsRevenue } from "@/components/dashboard/analytics-revenue"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Overview } from "@/components/dashboard/overview"
@@ -101,7 +101,7 @@ export default function Page() {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="revenue">Revenue</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
@@ -197,6 +197,9 @@ export default function Page() {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+        <TabsContent value="revenue" className="space-y-4">
+          <AnalyticsRevenue />
         </TabsContent>
       </Tabs>
     </div>

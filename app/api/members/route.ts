@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
 import { auth } from "@/auth"
-import { startOfDay } from "date-fns";
 
 export async function GET(req: Request) {
   try {
@@ -37,6 +36,7 @@ export async function GET(req: Request) {
           subscriptionPlan: {
             select: {
               planName: true,
+              price: true,
             },
           },
         },

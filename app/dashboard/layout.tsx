@@ -1,5 +1,6 @@
 "use client"
 import AdminSidebar from "@/components/admin-sidebar";
+import Navbar from "@/components/navbar";
 import { SessionProvider, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -8,12 +9,12 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
   }) {
-  const session = useSession();
-  const router = useRouter();
+  // const session = useSession();
+  // const router = useRouter();
 
-  if (!session.data?.user){
-    return router.push("/login")
-  } 
+  // if (!session.data?.user){
+  //   return router.push("/login")
+  // } 
 
   return (
     <SessionProvider>

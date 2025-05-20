@@ -19,20 +19,19 @@ export default function Navbar() {
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="flex items-center gap-4">
             <ModeToggle/>
-            <Link
-              href="/subscription-lookup"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              Check Subscription
-            </Link>
             {session ? (
               <Button variant="outline" asChild>
                 <Link href="/dashboard">Dashboard</Link>
               </Button>
             ) : (
-              <Button variant="outline" asChild>
+              <div className="flex items-center space-x-2">
+              <Button variant="secondary" asChild>
                 <Link href="/login">Login</Link>
               </Button>
+              <Button  asChild>
+                <Link href="/signup">Sign Up</Link>
+              </Button>
+              </div>
             )}
           </div>
         </div>
