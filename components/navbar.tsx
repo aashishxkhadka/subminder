@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
+import { ModeToggle } from "./mode-toggle"
 
 export default function Navbar() {
   const { data: session } = useSession()
@@ -17,6 +18,7 @@ export default function Navbar() {
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="flex items-center gap-4">
+            <ModeToggle/>
             <Link
               href="/subscription-lookup"
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"

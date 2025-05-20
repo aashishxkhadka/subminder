@@ -3,12 +3,13 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { CreditCard, CheckCircle, BarChart, Bell, Users, Shield } from "lucide-react"
+import Navbar from "@/components/navbar"
 
 export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b bg-background">
+      {/* <header className="sticky top-0 z-10 border-b bg-background">
         <div className="container flex h-16 items-center justify-between py-4">
           <div className="flex items-center gap-2">
             <Link href="/">
@@ -45,7 +46,8 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-      </header>
+      </header> */}
+      <Navbar/>
 
       {/* Hero Section */}
       <section className="w-full py-12 md:py-24 lg:py-32 bg-muted/40">
