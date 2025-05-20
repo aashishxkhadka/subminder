@@ -11,7 +11,10 @@ export default function AdminLayout({
   const session = useSession();
   const router = useRouter();
 
-  if (!session.data?.user) router.push("/login")
+  if (!session.data?.user){
+    return router.push("/login")
+  } 
+
   return (
     <SessionProvider>
       <div className="min-h-screen bg-background">

@@ -1,10 +1,10 @@
 "use client";
 
-import { Building, Users, Image, LogOut, PieChart, CreditCard, DollarSign, Bell } from "lucide-react";
+import {  Users,  LogOut, PieChart, CreditCard, DollarSign, Bell, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { signOut } from "next-auth/react";
 
 const adminNavItems = [
   {
@@ -31,29 +31,18 @@ const adminNavItems = [
     title: "Billing",
     href: "/dashboard/billing",
     icon: DollarSign
+  },
+
+  {
+    title: "Settings",
+    href: "/dashboard/settings",
+    icon: Settings2 
   }
 ];
 
 export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-
-  const handleLogout = async () => {
-    try {
-      const response = await fetch("/api/admin/logout", {
-        method: "POST",
-      });
-
-      if (!response.ok) {
-        throw new Error("Logout failed");
-      }
-
-      toast.success("Logged out successfully");
-      router.push("/admin-login");
-    } catch (error) {
-      toast.error("Failed to logout");
-    }
-  };
 
   return (
     <div className="w-64 min-h-screen bg-card border-r flex flex-col">
@@ -83,7 +72,7 @@ export default function AdminSidebar() {
         <Button
           variant="outline"
           className="w-full flex items-center gap-2"
-          onClick={handleLogout}
+          onClick={() => signOut()}
         >
           <LogOut className="h-4 w-4" />
           Logout

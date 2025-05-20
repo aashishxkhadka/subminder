@@ -69,27 +69,6 @@ model SubscriptionPlan {
   businessId  String
   members     Member[]
 }
-model Billing {
-  id                String     @id @default(uuid())
-  member            Member     @relation(fields: [memberId], references: [id])
-  memberId          String
-  subscriptionPlan  SubscriptionPlan @relation(fields: [subscriptionPlanId], references: [id])
-  subscriptionPlanId String
-
-  amount            Float
-  billingDate       DateTime   @default(now())
-  dueDate           DateTime
-  status            String     // "unpaid", "paid", "overdue"
-  
-  // Payment Fields
- 
-  
-  paymentStatus     String?    // "success", "failed", "pending"
-  paymentDate       DateTime?  // only if paid
-
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
-}
 
 model Billing {
   id         String   @id @default(uuid())
@@ -99,7 +78,6 @@ model Billing {
   billingDate DateTime @default(now())
   dueDate    DateTime
   status     String   // paid/unpaid
-  paymentLink String
   payment    Payment?
 }
 
