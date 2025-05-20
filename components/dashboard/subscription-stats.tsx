@@ -1,20 +1,19 @@
 "use client"
 
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
 import { useEffect, useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
 
 interface SubscriptionData {
-  name: string
-  value: number
+  status: string
+  count: number
 }
 
-interface Member {
-  id: string
-  endDate: string
-  subscriptionStatus: string
+const COLORS = {
+  active: "#22c55e",    // green-500
+  inactive: "#ef4444",  // red-500
+  suspended: "#f59e0b"  // amber-500
 }
-
-const COLORS = ["#0088FE", "#FF8042", "#FFBB28"]
 
 export function SubscriptionStats() {
   const [data, setData] = useState<SubscriptionData[]>([])
@@ -26,31 +25,22 @@ export function SubscriptionStats() {
         if (!response.ok) throw new Error('Failed to fetch data')
         const { members } = await response.json()
 
-        const stats = {
-          active: 0,
-          expired: 0,
-          pending: 0
-        }
-
-        members.forEach((member: Member) => {
-          switch (member.subscriptionStatus.toLowerCase()) {
-            case 'active':
-              stats.active++
-              break
-            case 'expired':
-              stats.expired++
-              break
-            case 'pending':
-              stats.pending++
-              break
+        // Count subscriptions by status
+        const statusCounts = members.reduce((acc: { [key: string]: number }, member: any) => {
+          const status = member.subscriptionStatus.toLowerCase()
+          if (status === 'active' || status === 'inactive' || status === 'suspended') {
+            acc[status] = (acc[status] || 0) + 1
           }
-        })
+          return acc
+        }, {})
 
-        setData([
-          { name: "Active", value: stats.active },
-          { name: "Expired", value: stats.expired },
-          { name: "Pending", value: stats.pending }
-        ])
+        // Convert to array format for the chart
+        const chartData = Object.entries(statusCounts).map(([status, count]) => ({
+          status: status.charAt(0).toUpperCase() + status.slice(1),
+          count
+        }))
+
+        setData(chartData)
       } catch (error) {
         console.error('Error fetching subscription stats:', error)
       }
@@ -60,24 +50,32 @@ export function SubscriptionStats() {
   }, [])
 
   return (
-    <div className="h-[350px]">
+    <div className="h-[300px]">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
             data={data}
             cx="50%"
             cy="50%"
-            labelLine={false}
+            innerRadius={60}
             outerRadius={80}
-            fill="#8884d8"
-            dataKey="value"
-            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            paddingAngle={5}
+            dataKey="count"
+            nameKey="status"
+            label={({ status, percent }) => `${status} ${(percent * 100).toFixed(0)}%`}
           >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              <Cell 
+                key={`cell-${index}`} 
+                fill={COLORS[entry.status.toLowerCase() as keyof typeof COLORS]} 
+              />
             ))}
           </Pie>
-          <Tooltip />
+          <Tooltip 
+            formatter={(value: number) => [`${value} subscriptions`, 'Count']}
+            labelFormatter={(label) => `${label} Status`}
+          />
+          <Legend />
         </PieChart>
       </ResponsiveContainer>
     </div>

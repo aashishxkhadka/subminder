@@ -49,10 +49,13 @@ export default function Page() {
           // Total members
           acc.totalMembers++
 
-          // Active subscriptions and revenue
+          // Active subscriptions
           if (member.subscriptionStatus.toLowerCase() === 'active') {
             acc.activeSubscriptions++
-            // Add subscription plan price to total revenue
+          }
+
+          // Add subscription plan price to total revenue regardless of status
+          if (member.subscriptionPlan && typeof member.subscriptionPlan.price === 'number') {
             acc.totalRevenue += member.subscriptionPlan.price
           }
 
@@ -142,7 +145,7 @@ export default function Page() {
                   ${stats.totalRevenue.toLocaleString()}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  From active subscriptions
+                  From all subscription plans
                 </p>
               </CardContent>
             </Card>
