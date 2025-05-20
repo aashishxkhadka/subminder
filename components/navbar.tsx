@@ -16,6 +16,18 @@ export default function Navbar() {
             <span className="font-bold">SubMinder</span>
           </Link>
         </div>
+
+        <nav className="hidden md:flex items-center gap-6">
+          <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            Features
+          </Link>
+          <Link href="/how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            How It Works
+          </Link>
+          <Link href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            Pricing
+          </Link>
+        </nav>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="flex items-center gap-4">
             <ModeToggle/>

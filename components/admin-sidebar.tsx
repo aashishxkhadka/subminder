@@ -45,7 +45,7 @@ export default function AdminSidebar() {
   return (
     <div className="w-64 min-h-screen bg-background border-r flex flex-col">
       <div className="p-4">
-        <h2 className="text-xl font-bold text-foreground">Admin Dashboard</h2>
+        <h2 className="text-xl font-bold text-foreground">Dashboard</h2>
       </div>
       <nav className="flex-1 mt-4">
         <ul className="space-y-2">

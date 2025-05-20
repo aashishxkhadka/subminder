@@ -7,45 +7,7 @@ import { CreditCard, BarChart3, Bell, Users, Shield, Zap, RefreshCw, Database, L
 export default function HowItWorksPage() {
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-10 border-b bg-background">
-        <div className="container flex h-16 items-center justify-between py-4">
-          <div className="flex items-center gap-2">
-            <Link href="/">
-              <Image
-                src="/subminder-logo.png"
-                alt="Subminder Logo"
-                width={150}
-                height={40}
-                className="h-auto"
-                priority
-              />
-            </Link>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Features
-            </Link>
-            <Link href="/how-it-works" className="text-sm font-medium hover:text-foreground">
-              How It Works
-            </Link>
-            <Link href="/#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Pricing
-            </Link>
-            <Link href="/#testimonials" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Testimonials
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href="/login">
-              <Button variant="outline">Log in</Button>
-            </Link>
-            <Link href="/signup">
-              <Button>Sign up</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+    
 
       {/* Hero Section */}
       <section className="w-full py-12 md:py-24 lg:py-32 bg-muted/40">
@@ -410,90 +372,6 @@ export default function HowItWorksPage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="w-full border-t bg-background py-6 md:py-12">
-        <div className="container px-4 md:px-6">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Image
-                  src="/subminder-logo.png"
-                  alt="Subminder Logo"
-                  width={120}
-                  height={30}
-                  className="h-auto"
-                  priority
-                />
-              </div>
-              <p className="text-sm text-muted-foreground">We automate. You accelerate.</p>
-            </div>
-            <div className="space-y-4">
-              <h4 className="text-sm font-bold">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/#features" className="text-muted-foreground hover:text-foreground">
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/how-it-works" className="text-muted-foreground hover:text-foreground">
-                    How It Works
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/#pricing" className="text-muted-foreground hover:text-foreground">
-                    Pricing
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <h4 className="text-sm font-bold">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground">
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <h4 className="text-sm font-bold">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground">
-                    Terms of Service
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground">
-                    Cookie Policy
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Subminder. All rights reserved.
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

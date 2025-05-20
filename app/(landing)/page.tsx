@@ -23,20 +23,6 @@ export default function HomePage() {
               />
             </Link>
           </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Features
-            </Link>
-            <Link href="/how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              How It Works
-            </Link>
-            <Link href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Pricing
-            </Link>
-            <Link href="#testimonials" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Testimonials
-            </Link>
-          </nav>
           <div className="flex items-center gap-4">
             <Link href="/login">
               <Button variant="outline">Log in</Button>
@@ -55,7 +41,7 @@ export default function HomePage() {
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Simplify Your <span className="italic border-b-4 hover:border-b-8 border-primary ">Subscription</span> Management
+                  Simplify Your <span className="italic border-b-4 hover:border-b-8 border-primary hover:translate-y-1">Subscription</span> Management
                 </h1>
                 <p className="max-w-[600px] text-muted-foreground md:text-lg">
                   Streamline your subscription business with our all-in-one platform. Track revenue, manage customers,

@@ -1,14 +1,18 @@
 "use client"
 import AdminSidebar from "@/components/admin-sidebar";
-import Navbar from "@/components/navbar";
 import { SessionProvider, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import "../globals.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { ThemeProvider } from "next-themes";
+import { Toaster } from "sonner";
 
+const queryClient = new QueryClient()
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
   }) {
+
   // const session = useSession();
   // const router = useRouter();
 
@@ -17,7 +21,11 @@ export default function AdminLayout({
   // } 
 
   return (
+    <html lang="en">
+      <body>
     <SessionProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background">
         <div className="flex">
           <AdminSidebar />
@@ -26,6 +34,11 @@ export default function AdminLayout({
           </div>
         </div>
       </div>
+            </QueryClientProvider>
+            <Toaster position="top-right" />
+          </ThemeProvider>
     </SessionProvider>
+      </body>
+    </html>
   );
 } 

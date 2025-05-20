@@ -1,6 +1,6 @@
 "use client"
 import type React from "react"
-import "./globals.css"
+import "../globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 
 import { Toaster } from "sonner"
@@ -19,14 +19,14 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <SessionProvider>
-          <Navbar/>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Navbar/>
             <QueryClientProvider client={queryClient}>
               {children}
             </QueryClientProvider>
             <Toaster position="top-right" />
-          </ThemeProvider>
           <Footer/>
+          </ThemeProvider>
         </SessionProvider>
       </body>
     </html>
