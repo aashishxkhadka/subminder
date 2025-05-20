@@ -87,4 +87,41 @@ export async function POST(req: Request) {
     console.error("[MEMBERS_POST]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
+}
+
+export async function GETAll() {
+  try {
+    const members = await prisma.member.findMany({
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        business: {
+          select: {
+            name: true
+          }
+        }
+      }
+    });
+
+    return NextResponse.json({ members });
+  } catch (error) {
+    console.error('Error fetching members:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch members' },
+      { status: 500 }
+    );
+  }
+}
+
+// New endpoint for getting all members for notifications
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 } 
