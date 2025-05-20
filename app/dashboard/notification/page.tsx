@@ -78,7 +78,7 @@ export default function Page() {
     <div className="">
       <h1 className="text-2xl font-bold mb-6">Notifications</h1>
       
-      <Card className="w-full max-w-2xl ">
+      <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle>Send Notification to All Members</CardTitle>
         </CardHeader>
