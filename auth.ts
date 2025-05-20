@@ -70,6 +70,7 @@ export const { handlers, auth } = NextAuth({
         session.user.name = token.name
         //@ts-expect-error email exists here
         session.user.email = token.email
+        session.user.role = "ADMIN"
       }
       return session
     }
