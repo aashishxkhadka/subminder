@@ -21,7 +21,7 @@ export default function RootLayout({
             <QueryClientProvider client={queryClient}>
               {children}
             </QueryClientProvider>
-            <Toaster />
+            <Toaster position="top-right" />
           </ThemeProvider>
         </SessionProvider>
       </body>

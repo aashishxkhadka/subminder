@@ -8,6 +8,9 @@ import { SubscriptionStats } from "@/components/dashboard/subscription-stats"
 import { ActivityFeed } from "@/components/dashboard/activity-feed"
 import { useEffect, useState } from "react"
 import { startOfMonth, endOfMonth, format } from "date-fns"
+import { useSession } from "next-auth/react"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface DashboardStats {
   totalMembers: number
@@ -27,6 +30,7 @@ interface Member {
 }
 
 export default function Page() {
+  const session = useSession();
   const [stats, setStats] = useState<DashboardStats>({
     totalMembers: 0,
     activeSubscriptions: 0,
@@ -83,9 +87,16 @@ export default function Page() {
   }, [])
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
+    <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+        <div className="flex items-center space-x-2">
+          <Button variant={'outline'}>{session?.data?.user.email}</Button>
+          <Avatar>
+            <AvatarImage src="" alt="@shadcn" />
+            <AvatarFallback>{session?.data?.user.email?.charAt(0).toUpperCase()}</AvatarFallback>
+          </Avatar>
+        </div>
       </div>
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>

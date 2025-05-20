@@ -75,10 +75,10 @@ export default function Page() {
   };
 
   return (
-    <div className="container py-8">
+    <div className="">
       <h1 className="text-2xl font-bold mb-6">Notifications</h1>
       
-      <Card className="w-full max-w-2xl mx-auto">
+      <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle>Send Notification to All Members</CardTitle>
         </CardHeader>
