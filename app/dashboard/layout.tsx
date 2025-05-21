@@ -5,6 +5,7 @@ import "../globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
+import { useRouter } from "next/navigation";
 
 const queryClient = new QueryClient()
 export default function AdminLayout({
@@ -13,13 +14,7 @@ export default function AdminLayout({
   children: React.ReactNode;
   }) {
 
-  // const session = useSession();
-  // const router = useRouter();
-
-  // if (!session.data?.user){
-  //   return router.push("/login")
-  // } 
-
+   
   return (
     <html lang="en">
       <body>
@@ -31,7 +26,7 @@ export default function AdminLayout({
           <AdminSidebar />
           <div className="flex-1 p-8">
             {children}
-          </div>
+          </div>dm
         </div>
       </div>
             </QueryClientProvider>

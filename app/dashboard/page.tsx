@@ -11,6 +11,7 @@ import { startOfMonth, endOfMonth, format } from "date-fns"
 import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useRouter } from "next/navigation"
 
 interface DashboardStats {
   totalMembers: number
@@ -37,6 +38,8 @@ export default function Page() {
     expiringThisMonth: 0,
     totalRevenue: 0
   })
+
+  
 
   useEffect(() => {
     const fetchStats = async () => {

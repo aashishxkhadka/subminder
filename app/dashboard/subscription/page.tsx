@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Pencil, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { AlertDialog, AlertDialogContent, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { AlertDialogCancel, AlertDialog, AlertDialogContent, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
 
 type SubscriptionPlan = {
@@ -57,9 +57,24 @@ export default function Page() {
     router.push(`/dashboard/subscription/${id}`)
   }
   const handleDelete = async (id: string) => {
-    await fetch(`/api/subscription/${id}`, { method: "DELETE" })
-    queryClient.invalidateQueries({ queryKey: ["subscriptions"] })
-    toast.success("Subscription plan deleted")
+    try {
+      const response = await fetch(`/api/subscription/${id}`, { method: "DELETE" })
+      const data = await response.json()
+      
+      if (!response.ok) {
+        if (data.code === "SUBSCRIPTION_IN_USE") {
+          toast.error(data.error)
+        } else {
+          toast.error("Failed to delete subscription plan")
+        }
+        return
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["subscriptions"] })
+      toast.success("Subscription plan deleted")
+    } catch (error) {
+      toast.error("Failed to delete subscription plan")
+    }
   }
 
 
@@ -133,9 +148,9 @@ export default function Page() {
                           <p>Are you sure you want to delete this subscription plan?</p>
                         </div>
                         <div className="flex justify-end space-x-2">
-                          <Button variant="outline" onClick={() => setPage(1)}>
+                          <AlertDialogCancel>
                             Cancel
-                          </Button>
+                          </AlertDialogCancel>
                           <Button
                             variant="destructive"
                             onClick={() => handleDelete(plan.id)}

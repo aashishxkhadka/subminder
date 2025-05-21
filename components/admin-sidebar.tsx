@@ -2,9 +2,9 @@
 
 import { Users, LogOut, PieChart, CreditCard, DollarSign, Bell, Settings2 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 const adminNavItems = [
   {
@@ -41,7 +41,9 @@ const adminNavItems = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
 
+ 
   return (
     <div className="w-64 min-h-screen bg-background border-r flex flex-col">
       <div className="p-4">
@@ -74,7 +76,10 @@ export default function AdminSidebar() {
         <Button
           variant="outline"
           className="w-full flex items-center gap-2"
-          onClick={() => signOut()}
+          onClick={() => {
+            signOut();
+            router.push("/login");
+          }}
         >
           <LogOut className="h-4 w-4" />
           Logout
