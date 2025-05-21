@@ -2,9 +2,9 @@ import { Resend } from 'resend';
 import prisma from '../lib/prisma.js';
 import { addDays, format } from 'date-fns';
 import { generateEmailContent } from './email-template.js';
-import { auth } from '@/auth.js';
 
-const resend = new Resend("re_aXRJ7i3X_LRrLsHRQAexAmyWX3HhdLJ57");
+
+const resend = new Resend("re_Zh3UMXWF_5iZ9Eciw8aS2PPMV5DownKQK");
 
 export async function checkExpiringSubscriptions() {
 

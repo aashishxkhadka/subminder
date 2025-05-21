@@ -19,6 +19,7 @@ export const { handlers, auth } = NextAuth({
         email: {},
         password: {}
       },
+      //@ts-expect-error
       authorize: async (credentials) => {
         try {
           const { email, password } = await signInSchema.parseAsync(credentials)
