@@ -55,7 +55,6 @@ model Member {
   businessId       String
   subscriptionPlan SubscriptionPlan @relation(fields: [subscriptionPlanId], references: [id])
   subscriptionPlanId String
-  billingRecords   Billing[]
   notifications    Notification[]
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt @default(now())
@@ -74,8 +73,7 @@ model SubscriptionPlan {
 
 model Billing {
   id         String   @id @default(uuid())
-  member     Member   @relation(fields: [memberId], references: [id])
-  memberId   String
+  member     String? 
   amount     Float
   billingDate DateTime @default(now())
   dueDate    DateTime

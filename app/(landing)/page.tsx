@@ -1,11 +1,44 @@
+"use client";
+
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { CreditCard, CheckCircle, BarChart, Bell, Users, Shield } from "lucide-react"
 import Navbar from "@/components/navbar"
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 export default function HomePage() {
+  const [isLoading, setIsLoading] = useState<string | null>(null)
+
+  const handlePlanSelection = async (plan: string) => {
+    try {
+      setIsLoading(plan)
+      const response = await fetch('/api/checkout_sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ plan }),
+      })
+
+      const data = await response.json()
+
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
+      // Redirect to Stripe Checkout
+      window.location.href = data.url
+    } catch (error) {
+      console.error('Error:', error)
+      alert('Something went wrong. Please try again.')
+    } finally {
+      setIsLoading(null)
+    }
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
@@ -183,7 +216,13 @@ export default function HomePage() {
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full mt-auto">Get Started</Button>
+                <Button
+                  className="w-full mt-auto"
+                  onClick={() => handlePlanSelection('starter')}
+                  disabled={isLoading === 'starter'}
+                >
+                  {isLoading === 'starter' ? 'Loading...' : 'Get Started'}
+                </Button>
               </CardContent>
             </Card>
             <Card className="flex flex-col border-primary">
@@ -216,7 +255,13 @@ export default function HomePage() {
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full mt-auto">Get Started</Button>
+                <Button
+                  className="w-full mt-auto"
+                  onClick={() => handlePlanSelection('professional')}
+                  disabled={isLoading === 'professional'}
+                >
+                  {isLoading === 'professional' ? 'Loading...' : 'Get Started'}
+                </Button>
               </CardContent>
             </Card>
             <Card className="flex flex-col">
@@ -250,7 +295,13 @@ export default function HomePage() {
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full mt-auto">Contact Sales</Button>
+                <Button
+                  className="w-full mt-auto"
+                  onClick={() => handlePlanSelection('enterprise')}
+                  disabled={isLoading === 'enterprise'}
+                >
+                  {isLoading === 'enterprise' ? 'Loading...' : 'Get Started'}
+                </Button>
               </CardContent>
             </Card>
           </div>
